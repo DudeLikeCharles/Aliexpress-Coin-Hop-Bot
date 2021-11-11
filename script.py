@@ -57,6 +57,7 @@ def find_longest(white_pixels):
 while True:
     im_array = find_white(screenshot())
 
-    device.shell('input touchscreen swipe 500 500 500 500 '+find_longest(im_array)*mult*create_multiplyer())
+    device.shell('input touchscreen swipe 500 500 500 500 '+find_longest(im_array)*multi)
+    multi = multi*create_mult(input())
     time.sleep(2.5)
 
