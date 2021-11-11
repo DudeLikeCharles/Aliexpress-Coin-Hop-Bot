@@ -8,6 +8,12 @@ if len (adb.devices()) == 0:
     print("No devices found")
     exit(1)
 device=devices[0]
+#create multiplyer that increases on true and decreases on false
+def create_multiplyer(toofar,mult):
+    if toofar == True:
+        return mult*1.1
+    else:
+        return mult*0.9
 
 #crop top 200 pixels of the image
 def crop_top(im_array):
@@ -30,6 +36,8 @@ def find_white(im_array):
 #find longest distance in white pixels pair of x and y
 def find_longest(white_pixels):
     longest = 0
+    toofar = False
+    mult=1
     for i in range(0,len(white_pixels)):
         for j in range(i+1,len(white_pixels)):
             x_distance = abs(white_pixels[i][0] - white_pixels[j][0])
