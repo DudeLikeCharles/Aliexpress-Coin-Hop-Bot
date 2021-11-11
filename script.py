@@ -8,16 +8,21 @@ if len (adb.devices()) == 0:
     print("No devices found")
     exit(1)
 device=devices[0]
-#create multiplyer that increases on true and decreases on false
-def create_multiplyer(toofar,mult):
-    if toofar == True:
-        return mult*1.1
+#create multiplyer that increases on true and decreases on false from user input
+def create_mult(user_input):
+    if user_input == "y":
+        mult = 1.1
+    elif user_input == "n":
+        mult = 0.9
     else:
-        return mult*0.9
+        print("Please enter y or n")
+        mult = create_mult(input())
+    return mult
+
 
 #crop top 200 pixels of the image
 def crop_top(im_array):
-    im_array = im_array[200:,:,:]
+    im_array = im_array[400:,:,:]
     return im_array
 #create an array from a screenshot
 def screenshot():
@@ -37,7 +42,7 @@ def find_white(im_array):
 def find_longest(white_pixels):
     longest = 0
     toofar = False
-    mult=1
+    mult=1.0
     for i in range(0,len(white_pixels)):
         for j in range(i+1,len(white_pixels)):
             x_distance = abs(white_pixels[i][0] - white_pixels[j][0])
@@ -52,6 +57,6 @@ def find_longest(white_pixels):
 while True:
     im_array = find_white(screenshot())
 
-    device.shell('input touchscreen swipe 500 500 500 500 '+find_longest(im_array))
+    device.shell('input touchscreen swipe 500 500 500 500 '+find_longest(im_array)*mult*create_multiplyer())
     time.sleep(2.5)
 
