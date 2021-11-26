@@ -100,6 +100,3 @@ while True:
 
     device.shell('input  swipe 500 500 500 500 '+str(pya))
     time.sleep(2)
-  
-
-#detect object
