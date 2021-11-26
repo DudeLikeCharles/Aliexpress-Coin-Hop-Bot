@@ -2,62 +2,104 @@ from ppadb.client import Client
 from PIL import Image
 import numpy 
 import time
-adb = Client(host='127.0.0.1',port=5037)
-devices = adb.devices()
-if len (adb.devices()) == 0:
-    print("No devices found")
-    exit(1)
-device=devices[0]
-#create multiplyer that increases on true and decreases on false from user input
-def create_mult(user_input):
-    if user_input == "y":
-        mult = 1.1
-    elif user_input == "n":
-        mult = 0.9
-    else:
-        print("Please enter y or n")
-        mult = create_mult(input())
-    return mult
+import cv2
 
+#get touple array and return 2 rectangles with the largest y value
+def get_largest_y(rect):
+    largest_y = 2000000
+    largest_y_rect = []
+    pya=0
+    for i in range(len(rect)):
+        if rect[i][1] < largest_y:
+            largest_y = rect[i][1]
+            largest_y_rect = rect[i]
+            pya=i
+    rect.pop(pya)
+    return largest_y_rect
+#function that detects objects in pictures and draws a rectangle around them
+def detect_objects(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    #create touple list with 4 values
+    rect = ([])
+    blur = cv2.GaussianBlur(gray, (5,5), 0)
+    ret, thresh = cv2.threshold(blur, 70, 255, cv2.THRESH_BINARY)
+    contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    for cnt in contours:
+        x, y, w, h = cv2.boundingRect(cnt)
+        #store x,y,w,h in a list
+        
+        if w>60 and h>60 and w<1000 and h<1000 and y>310  :
+            cv2.rectangle(image, (x,y), (x+w, y+h), (0,0,255), 2)
+            rect.append([x,y,w,h])
 
-#crop top 200 pixels of the image
-def crop_top(im_array):
-    im_array = im_array[400:,:,:]
-    return im_array
-#create an array from a screenshot
-def screenshot():
-    im = Image.open(device.screencap())
-    im_array = numpy.array(im)
-    crop_top(im_array)
-    return im_array
-#find all the white pixels and return their positions
-def find_white(im_array):
-    white_pixels = []
-    for y in range(0,im_array.shape[0]):
-        for x in range(0,im_array.shape[1]):
-            if im_array[y][x][0] == 255 and im_array[y][x][1] == 255 and im_array[y][x][2] == 255:
-                white_pixels.append((x,y))
-    return white_pixels
-#find longest distance in white pixels pair of x and y
-def find_longest(white_pixels):
-    longest = 0
-    toofar = False
-    mult=1.0
-    for i in range(0,len(white_pixels)):
-        for j in range(i+1,len(white_pixels)):
-            x_distance = abs(white_pixels[i][0] - white_pixels[j][0])
-            y_distance = abs(white_pixels[i][1] - white_pixels[j][1])
-            if x_distance > y_distance:
-                distance = x_distance
-            else:
-                distance = y_distance
-            if distance > longest:
-                longest = distance
-    return longest
+    #save image with rectangles
+    cv2.imwrite('image.png', image)
+    return find_distance(get_largest_y(rect), get_largest_y(rect))
+# x distance between two rectangles
+
+def find_distance(rect1, rect2):
+    print(rect1)
+    print(rect2)
+    if(rect2[2]>600):
+        rect2[2]=rect2[2]-200
+    if(rect1[2]>600):
+        rect1[2]=rect1[2]-200
+    x1 = rect1[0]+rect1[2]/2
+    x2 = rect2[0]+rect2[2]/2
+    distance=0
+    distance = distance +abs(x1 - x2)
+    print(distance)
+    return distance
+#find the distance between two contours
+#connect to device
+client = Client(host="127.0.0.1", port=5037) # Default is "127.0.0.1" and 5037
+devices = client.devices()
+device = devices[0]
+print(f'Connected to {device}')
 while True:
-    im_array = find_white(screenshot())
+#perform swipe +
 
-    device.shell('input touchscreen swipe 500 500 500 500 '+find_longest(im_array)*multi)
-    multi = multi*create_mult(input())
-    time.sleep(2.5)
 
+
+    #use cv to detect object
+    #get screenshot
+    screenshot = device.screencap()
+    #save screenshot
+    with open("screenshot.png", "wb") as f:
+        f.write(screenshot)
+    #convert to numpy array
+    img = Image.open("screenshot.png")
+    #save image from detect objects
+    #create numpy array
+    img_np = numpy.array(img)
+    pya=detect_objects(img_np)
+    pya=round(pya*1.05)
+    if(pya==72):
+        device.shell('input  tap 602 1500 500 500 200')
+        time.sleep(1.5)
+        for i in range(4):
+            device.shell('input  tap 635 2080 500 500 200')
+            time.sleep(2)
+            device.shell('input  tap 559 1563 500 500 200')
+            time.sleep(2)
+            device.shell('input  tap 70 125 500 500 200')
+            time.sleep(1)
+        time.sleep(2)
+        device.shell('input  swipe 500 500 500 500 '+str(pya))
+        time.sleep(2)
+        device.shell('input  tap 602 1500 500 500 200')
+        time.sleep(2)
+        continue
+        print("tu")
+    pya=max(pya,330)
+    if(pya<400):
+        pya=pya+30
+    print("Distance :"+str(pya))
+    #save img1 as a png
+    time.sleep(0.5)
+
+    device.shell('input  swipe 500 500 500 500 '+str(pya))
+    time.sleep(2)
+  
+
+#detect object
