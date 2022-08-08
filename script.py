@@ -1,6 +1,6 @@
 from ppadb.client import Client
 from PIL import Image
-import numpy 
+import numpy
 import time
 import cv2
 
@@ -27,8 +27,8 @@ def detect_objects(image):
     for cnt in contours:
         x, y, w, h = cv2.boundingRect(cnt)
         #store x,y,w,h in a list
-        
-        if w>60 and h>60 and w<1000 and h<1000 and y>310  :
+
+        if w>60 and h>60 and w<300 and h<300 and y>310:
             cv2.rectangle(image, (x,y), (x+w, y+h), (0,0,255), 2)
             rect.append([x,y,w,h])
 
