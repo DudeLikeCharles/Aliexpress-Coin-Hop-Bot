@@ -12,8 +12,6 @@ Just follow these steps:
 5. Connect the Phone to the computer via USB and open the Game.
 6. Run the code `python3 script.py`
 
-For information on getting a bot token, follow the steps on [the Discord developer documentation.](https://discordapp.com/developers/docs/intro)
-
 ## To-do
 - [x] Make the bot work again with the new design
 - [ ] Fix crash when the bot picks a rocket boost
