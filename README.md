@@ -8,7 +8,7 @@ Just follow these steps:
 1. Have [Python](https://www.python.org/downloads/) installed.
 2. Clone this repository to a folder on your computer.
 3. Open a terminal in that folder, and install all the dependencies with `pip install -r requirements.txt`
-4. Enable USB debugin (with input option also enabled) via developer tools  in your Android device.
+4. Enable USB debugging (with input option also enabled) via developer tools  in your Android device.
 5. Connect the Phone to the computer via USB and open the Game.
 6. Run the code `python3 script.py`
 
