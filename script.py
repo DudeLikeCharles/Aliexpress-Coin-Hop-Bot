@@ -4,7 +4,7 @@ import numpy
 import time
 import cv2
 
-#get touple array and return 2 rectangles with the largest y value
+#get tuple array and return 2 rectangles with the largest y value
 def get_largest_y(rect):
     largest_y = 2000000
     largest_y_rect = []
@@ -19,7 +19,7 @@ def get_largest_y(rect):
 #function that detects objects in pictures and draws a rectangle around them
 def detect_objects(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    #create touple list with 4 values
+    #create tuple list with 4 values
     rect = ([])
     blur = cv2.GaussianBlur(gray, (5,5), 0)
     ret, thresh = cv2.threshold(blur, 70, 255, cv2.THRESH_BINARY)
